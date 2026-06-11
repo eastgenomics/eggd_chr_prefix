@@ -1,7 +1,7 @@
 {
-  "name": "eggd_<tool_name>",
-  "title": "eggd_<tool_name>",
-  "summary": "description",
+  "name": "eggd_chr_prefix",
+  "title": "eggd_chr_prefix",
+  "summary": "Adds or removes the 'chr' prefix from a BAM file header using samtools reheader.",
   "dxapi": "1.0.0",
   "version": "1.0.0",
   "properties": {
@@ -12,60 +12,55 @@
       "name": "input_file",
       "class": "file",
       "optional": true,
-      "label": "Name of input file",
-      "patterns": [
-        "*.tsv", "*.vcf", "*.bed", "*.xlsx"
-      ],
-      "help": "Description"
+      "label": "Input single BAM file",
+      "patterns": ["*.bam"],
+      "help": "The single BAM file to add or remove the 'chr' prefix from."
     },
     {
       "name": "input_file_array",
       "class": "array:file",
-      "optional": false,
-      "label": "Name of input file array",
+      "optional": true,
+      "label": "Input BAM file array",
       "suggestions": [
         {
         "project": "project-Fkb6Gkj433GVVvj73J7x8KbV",
         "path": "/folder1/folder2/"
         }
       ],
-      "help": "Description"
+      "help": "Provide an array of BAM files to add or remove the 'chr' prefix from"
     },
     {
-      "name": "input_boolean",
-      "class": "boolean",
-      "optional": true,
-      "default": true,
-      "label": "Name of field",
-      "help": "Description"
-    },
-    {
-      "name": "input_string",
+      "name": "input_folder",
       "class": "string",
-      "label": "Input string field name",
       "optional": true,
-      "default": "default string input",
-      "help": "Description"
+      "label": "Input Folder Path",
+      "help": "Provide a project folder path (blank if using the current path) to automatically find and process all BAM files inside it."
+    },
+    {
+      "name": "mode",
+      "class": "string",
+      "optional": false,
+      "default": "add_chr",
+      "choices": ["add_chr", "remove_chr"],
+      "label": "Prefix Edit Mode",
+      "help": "Choose 'add_chr' to convert format to chr1-22/chrX/chrY/chrM. Choose 'remove_chr' to convert format to 1-22/X/Y/MT."
     }
   ],
   "outputSpec": [
     {
-      "name": "output_file",
-      "class": "file",
-      "label": "output file",
-      "patterns": [
-        "*.tsv", "*.vcf", "*.bed", "*.xlsx"
-      ],
-      "help": "Description"
+      "name": "output_files",
+      "class": "array:file",
+      "label": "Output modified BAM files",
+      "patterns": ["*.bam"],
+      "help": "The resulting BAM files with modified headers."
     },
     {
-      "name": "output_files_array",
+      "name": "output_indices",
       "class": "array:file",
-      "label": "output files",
-      "optional": true,
-      "help": "Description"
+      "label": "Output modified BAM indices",
+      "patterns": ["*.bai"],
+      "help": "The BAI index files for the modified BAM files."
     }
-
   ],
   "runSpec": {
     "timeoutPolicy": {
@@ -80,31 +75,15 @@
     "file": "src/code.sh",
     "assetDepends": [
       {
-        "name": "bedtools",
+        "name": "samtools",
         "project": "project-Fkb6Gkj433GVVvj73J7x8KbV",
-        "folder": "/app_assets/bedtools/bedtools_v2.30.0",
-        "version": "2.30.0"
-      },
-      {
-        "name": "htslib",
-        "project": "project-Fkb6Gkj433GVVvj73J7x8KbV",
-        "folder": "/app_assets/htslib/htslib_v1.15.0",
-        "version": "1.15.0"
-      },
-      {
-        "name": "python_packages",
-        "project": "project-Fkb6Gkj433GVVvj73J7x8KbV",
-        "folder": "/app_assets/python_packages/python_packages_v1.1.0",
-        "version": "1.1.0"
+        "folder": "/app_assets/samtools/samtools_v1.19.2",
+        "version": "1.19.2"
       }
     ]
   },
-  "developers":[
-    "org-emee_1"
-  ],
-  "authorizedUsers": [
-    "org-emee_1"
-  ],
+  "developers":["siiikiiii"],
+  "authorizedUsers": ["org-emee_1"],
   "regionalOptions": {
     "aws:eu-central-1": {
       "systemRequirements": {
