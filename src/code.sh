@@ -6,24 +6,83 @@
 set -e -x -o pipefail
 
 main() {
-    # Install packages if required
-
-    ## Download input files (individual or an array)
-    # either all at once, in which case they are placed into separate folders
-    dx-download-all-inputs --parallel
-    # Each input is placed under its own subfolder "~/in/name_of_input_field/", named after the input field.
-    # can be accessed by using $input_file_path variable or
-    # $input_file_name equivalent to basename command,
-    # $input_file_prefix filename without the extension
-    #  also for array of files input, individual files are downloaded into subfolders
-    # /in/input_file_array/0/file0 and /in/input_file_array/1/file1 and so on
-    # in which case they have to be moved manually into the same folder, if needed
-    mkdir input_files
-    find ~/in/input_file_array -type f -name "*" -print0 | xargs -0 -I {} mv {} ~/input_files
-
-    # or files can be downloaded one by one, specifying a name for them within the workstation
-    dx download "$input_file" -o input_file_name
-
+    local mode="${mode:-add_chr}" # Defaults to add_chr if no mode is specified
+    echo "Starting eggd_chr_prefix execution..."
+    echo "Selected Mode: '$mode'"
     
+    # If no inputs at all are provided, default to project root "/"
+    if [ -z "$input_file" ] && [ -z "$input_file_array" ] && [ -z "$input_folder" ]; then
+        echo "No specific inputs provided. Defaulting input_folder to project root '/'."
+        input_folder="/"
+    fi
 
+    # 1. Gather Inputs
+    local bam_files=()
+    
+    if [ -n "$input_file" ]; then
+        bam_files+=("$input_file")
+    fi
+
+    if [ -n "$input_file_array" ]; then
+        bam_files+=("${input_file_array[@]}")
+    fi
+
+    if [ -n "$input_folder" ]; then
+    # Find all BAMs in the specified folder path
+    while read -r file; do
+        bam_files+=("$file")
+    done < <(find "$input_folder" -maxdepth 1 -name "*.bam")
+    fi
+
+    if [ ${#bam_files[@]} -eq 0 ] || [ "${bam_files[0]}" == "*.bam" ]; then
+    echo "Error: No target BAM files found."
+    exit 1
+    fi
+
+    echo "Total files selected: ${#bam_files[@]}"
+
+    # 2. Main Execution
+
+    for BAM in "${bam_files[@]}"; do
+    # Extract folder path and base filename to dynamically mimic "25316S0020"
+    local DIR_NAME=$(dirname "$BAM")
+    local BASE_NAME=$(basename "$BAM" .bam)
+    local TEMP_HEADER="${DIR_NAME}/${BASE_NAME}_header.sam"
+    local OUTPUT_BAM
+    local sed_cmd 
+
+    # Swap your sed logic dynamically based on mode
+        if [ "$mode" == "remove_chr" ]; then
+            sed_cmd='s/\tSN:chr\([0-9][0-9]*\)\t/\tSN:\1\t/g; s/\tSN:chrX\t/\tSN:X\t/g; s/\tSN:chrY\t/\tSN:Y\t/g; s/\tSN:chrM\t/\tSN:MT\t/g'
+            OUTPUT_BAM="${DIR_NAME}/${BASE_NAME}_no_chr.bam"
+        else
+            sed_cmd='s/\tSN:\([0-9][0-9]*\)\t/\tSN:chr\1\t/g; s/\tSN:X\t/\tSN:chrX\t/g; s/\tSN:Y\t/\tSN:chrY\t/g; s/\tSN:MT\t/\tSN:chrM\t/g'
+            OUTPUT_BAM="${DIR_NAME}/${BASE_NAME}_chr.bam"
+        fi
+
+        echo "=== Reheadering: $BASE_NAME ==="
+        echo "Input BAM: $BAM"
+        
+        # Extract and modify the header
+        samtools view -H "$BAM" | sed "$sed_cmd" > "$TEMP_HEADER"
+        
+        echo "Header before/after:"
+        grep "^@SQ" "$TEMP_HEADER" | head -3 || true
+        
+        # Reheader into the new BAM
+        samtools reheader "$TEMP_HEADER" "$BAM" > "$OUTPUT_BAM"
+        
+        echo "Indexing..."
+        samtools index "$OUTPUT_BAM"
+        
+        echo "Verifying chr prefix in new BAM:"
+        samtools view -H "$OUTPUT_BAM" | grep "^@SQ" | head -5 || true
+        
+        # Clean up the temporary header file
+        rm -f "$TEMP_HEADER"
+        
+        echo "Done: $BASE_NAME"
+    done
+
+    echo "Success: eggd_chr_prefix job completed."
 }
