@@ -44,43 +44,59 @@ main() {
     # 2. Main Execution
 
     for BAM in "${bam_files[@]}"; do
-    # Extract folder path and base filename to dynamically mimic "25316S0020"
+    # Extract folder path and base filename
     local DIR_NAME=$(dirname "$BAM")
     local BASE_NAME=$(basename "$BAM" .bam)
+    local ORIG_HEADER="${DIR_NAME}/${BASE_NAME}_orig_header.sam"
     local TEMP_HEADER="${DIR_NAME}/${BASE_NAME}_header.sam"
     local OUTPUT_BAM
-    local sed_cmd 
+    local sed_cmd
 
-    # Swap your sed logic dynamically based on mode
-        if [ "$mode" == "remove_chr" ]; then
-            sed_cmd='s/\tSN:chr\([0-9][0-9]*\)\t/\tSN:\1\t/g; s/\tSN:chrX\t/\tSN:X\t/g; s/\tSN:chrY\t/\tSN:Y\t/g; s/\tSN:chrM\t/\tSN:MT\t/g'
-            OUTPUT_BAM="${DIR_NAME}/${BASE_NAME}_no_chr.bam"
-        else
-            sed_cmd='s/\tSN:\([0-9][0-9]*\)\t/\tSN:chr\1\t/g; s/\tSN:X\t/\tSN:chrX\t/g; s/\tSN:Y\t/\tSN:chrY\t/g; s/\tSN:MT\t/\tSN:chrM\t/g'
-            OUTPUT_BAM="${DIR_NAME}/${BASE_NAME}_chr.bam"
-        fi
+    # Swap sed logic based on mode
+        case "$mode" in
+            "add_chr")
+                sed_cmd='s/\tSN:\([0-9][0-9]*\)\t/\tSN:chr\1\t/g; s/\tSN:X\t/\tSN:chrX\t/g; s/\tSN:Y\t/\tSN:chrY\t/g; s/\tSN:MT\t/\tSN:chrM\t/g'
+                OUTPUT_BAM="${DIR_NAME}/${BASE_NAME}_chr.bam"
+                ;;
 
+            "remove_chr")
+                sed_cmd='s/\tSN:chr\([0-9][0-9]*\)\t/\tSN:\1\t/g; s/\tSN:chrX\t/\tSN:X\t/g; s/\tSN:chrY\t/\tSN:Y\t/g; s/\tSN:chrM\t/\tSN:MT\t/g'
+                OUTPUT_BAM="${DIR_NAME}/${BASE_NAME}_no_chr.bam"
+                ;;
+
+            *)
+                echo "Error: Unexpected execution mode runtime state '$mode'."
+                echo "Valid options are: 'add_chr' or 'remove_chr'."
+                exit 1
+                ;;
+        esac
+        
         echo "=== Reheadering: $BASE_NAME ==="
         echo "Input BAM: $BAM"
         
-        # Extract and modify the header
-        samtools view -H "$BAM" | sed "$sed_cmd" > "$TEMP_HEADER"
+        # Extract and modify the header and compare the old one
+        samtools view -H "$BAM" > "$ORIG_HEADER"
+        sed "$sed_cmd" "$ORIG_HEADER" > "$TEMP_HEADER"
         
-        echo "Header before/after:"
-        grep "^@SQ" "$TEMP_HEADER" | head -3 || true
+        if cmp -s "$ORIG_HEADER" "$TEMP_HEADER"; then
+            echo "Notice: File is already in '$mode' format. No changes needed."
+            echo "Skipping BAM creation."
+        else
+            echo "Header before/after:"
+            grep "$ORIG_HEADER" "$TEMP_HEADER" | head -3 || true
         
-        # Reheader into the new BAM
-        samtools reheader "$TEMP_HEADER" "$BAM" > "$OUTPUT_BAM"
+            # Reheader into the new BAM
+            samtools reheader "$TEMP_HEADER" "$BAM" > "$OUTPUT_BAM"
         
-        echo "Indexing..."
-        samtools index "$OUTPUT_BAM"
+            echo "Indexing..."
+            samtools index "$OUTPUT_BAM"
         
-        echo "Verifying chr prefix in new BAM:"
-        samtools view -H "$OUTPUT_BAM" | grep "^@SQ" | head -5 || true
+            echo "Verifying chr prefix in new BAM:"
+            samtools view -H "$OUTPUT_BAM" | grep "^@SQ" | head -5 || true
+        fi
         
         # Clean up the temporary header file
-        rm -f "$TEMP_HEADER"
-        
+        rm -f "$ORIG_HEADER" "$TEMP_HEADER"
         echo "Done: $BASE_NAME"
     done
 
