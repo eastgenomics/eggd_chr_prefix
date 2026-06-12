@@ -75,14 +75,14 @@
     "file": "src/code.sh",
     "assetDepends": [
       {
-        "name": "samtools",
+        "name": "htslib",
         "project": "project-Fkb6Gkj433GVVvj73J7x8KbV",
-        "folder": "/app_assets/samtools/samtools_v1.19.2",
-        "version": "1.19.2"
+        "folder": "/app_assets/htslib/htslib_v1.22.0",
+        "version": "1.22.0"
       }
     ]
   },
-  "developers":["siiikiiii"],
+  "developers":["org-emee_1"],
   "authorizedUsers": ["org-emee_1"],
   "regionalOptions": {
     "aws:eu-central-1": {
