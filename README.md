@@ -19,6 +19,8 @@ Note: If none data are provided (input_file, input_file_array, or input_folder),
 - output_files (array of files): The resulting .bam files with modified headers. They are dynamically named using _chr or _no_chr suffixes based on the selected mode to prevent overwriting original data.
 - output_indices (array of files): The corresponding .bai index files for the newly modified BAMs.
 
+Note: if the file is already in '$mode' format. No new files are created.
+
 ## How to run this app from command line?
 ```
 Example A: Running on a single file
