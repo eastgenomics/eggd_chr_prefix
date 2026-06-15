@@ -14,7 +14,7 @@ eggd_chr_prefix modifies the metadata headers of alignment files (BAMs) to eithe
     - Select remove_chr to convert formats to standard Ensembl (e.g., chr1-22 → 1-22, chrX → X, chrM → MT).
 - output_folder(string, optional): A DNAnexus project folder path (e.g., /data/cohort_bams/). The app will add the newly generated files in this folder; if not provided, the original input_file/folder will be used as the output folder.
  
-Note: If none data are provided (input_file, input_file_array, or input_folder), the script will run default to project root "/" and search any *.bam files under this root.
+Note: If none data are provided (input_file, input_file_array, or input_folder), the script will run default to project root "." and search any *.bam files under this root.
 
 ## What are the outputs?
 - output_files (array of files): The resulting .bam files with modified headers. They are dynamically named using _chr or _no_chr suffixes based on the selected mode to prevent overwriting original data.
