@@ -41,27 +41,38 @@ main() {
 
     echo "Total files selected: ${#bam_files[@]}"
 
+
     # 2. Main Execution
 
     for BAM in "${bam_files[@]}"; do
     # Extract folder path and base filename
     local DIR_NAME=$(dirname "$BAM")
-    local BASE_NAME=$(basename "$BAM" .bam)
+    if [ -n "$output_folder" ]; then
+        echo "Custom Output Path: '$output_folder'"
+        local TARGET_DIR="$output_folder"
+        mkdir -p "$TARGET_DIR"
+    else
+        echo "Output Path: (Original Input Folders)"
+        local TARGET_DIR=DIR_NAME
+    fi
+    local BASE_NAME=$(basename "$BAM" .bam) 
     local ORIG_HEADER="${DIR_NAME}/${BASE_NAME}_orig_header.sam"
     local TEMP_HEADER="${DIR_NAME}/${BASE_NAME}_header.sam"
     local OUTPUT_BAM
     local sed_cmd
 
+
+
     # Swap sed logic based on mode
         case "$mode" in
             "add_chr")
                 sed_cmd='s/\tSN:\([0-9][0-9]*\)\t/\tSN:chr\1\t/g; s/\tSN:X\t/\tSN:chrX\t/g; s/\tSN:Y\t/\tSN:chrY\t/g; s/\tSN:MT\t/\tSN:chrM\t/g'
-                OUTPUT_BAM="${DIR_NAME}/${BASE_NAME}_chr.bam"
+                OUTPUT_BAM="${TARGET_DIR}/${BASE_NAME}_chr.bam"
                 ;;
 
             "remove_chr")
                 sed_cmd='s/\tSN:chr\([0-9][0-9]*\)\t/\tSN:\1\t/g; s/\tSN:chrX\t/\tSN:X\t/g; s/\tSN:chrY\t/\tSN:Y\t/g; s/\tSN:chrM\t/\tSN:MT\t/g'
-                OUTPUT_BAM="${DIR_NAME}/${BASE_NAME}_no_chr.bam"
+                OUTPUT_BAM="${TARGET_DIR}/${BASE_NAME}_no_chr.bam"
                 ;;
 
             *)
@@ -107,4 +118,4 @@ main() {
 }
 
 # Execute the main function
-#main "$@"
+main "$@"
