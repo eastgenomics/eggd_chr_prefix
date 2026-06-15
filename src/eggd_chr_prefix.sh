@@ -107,4 +107,4 @@ main() {
 }
 
 # Execute the main function
-main "$@"
+#main "$@"
