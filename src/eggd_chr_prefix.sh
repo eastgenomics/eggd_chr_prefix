@@ -3,7 +3,7 @@
 
 # Exit at any point if there is any error and output each line as it is executed (for debugging)
 # -e = exit on error; -x = output each line that is executed to log; -o pipefail = throw an error if there's an error in pipeline
-set -e -x -o pipefail
+set -e -o pipefail
 
 main() {
     local mode="${mode:-add_chr}" # Defaults to add_chr if no mode is specified
@@ -12,8 +12,8 @@ main() {
     
     # If no inputs at all are provided, default to project root "/"
     if [ -z "$input_file" ] && [ -z "$input_file_array" ] && [ -z "$input_folder" ]; then
-        echo "No specific inputs provided. Defaulting input_folder to project root '/'."
-        input_folder="/"
+        echo "No specific inputs provided. Defaulting input_folder to project root './'."
+        input_folder="./"
     fi
 
     # 1. Gather Inputs
@@ -82,8 +82,11 @@ main() {
             echo "Notice: File is already in '$mode' format. No changes needed."
             echo "Skipping BAM creation."
         else
-            echo "Header before/after:"
-            grep "$ORIG_HEADER" "$TEMP_HEADER" | head -3 || true
+            echo "Header before:"
+            grep "^@SQ" "$ORIG_HEADER" | head -3 || true
+
+           echo "Header after:" 
+            grep "^@SQ" "$TEMP_HEADER" | head -3 || true
         
             # Reheader into the new BAM
             samtools reheader "$TEMP_HEADER" "$BAM" > "$OUTPUT_BAM"
@@ -102,3 +105,6 @@ main() {
 
     echo "Success: eggd_chr_prefix job completed."
 }
+
+# Execute the main function
+main "$@"
