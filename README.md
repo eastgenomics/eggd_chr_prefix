@@ -1,5 +1,5 @@
 <!-- dx-header -->
-# AmazingApp (DNAnexus Platform App)
+# eggd_chr_prefix
 This app provides an automated solution for handling Ensembl (1-22/X/Y/MT) and UCSC (chr1-22/X/Y/MT) chromosome naming differences within BAM files on the DNAnexus platform.
 
 ## What does this app do?
