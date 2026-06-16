@@ -30,20 +30,6 @@
       "help": "Provide an array of BAM files to add or remove the 'chr' prefix from"
     },
     {
-      "name": "input_folder",
-      "class": "string",
-      "optional": true,
-      "label": "Input Folder Path",
-      "help": "Provide a project folder path (e.g., /data/cohort_bams/, leave blank if using the current path) to automatically find and process all BAM files inside it."
-    },
-    {
-      "name": "output_folder",
-      "class": "string",
-      "optional": true,
-      "label": "Output Folder Path",
-      "help": "Provide an output folder path (e.g., /data/cohort_bams/). The app will add the newly generated files in this folder; if not provided, the original input_file/folder will be used as the output folder."
-    },
-    {
       "name": "mode",
       "class": "string",
       "optional": false,
