@@ -34,10 +34,12 @@ main() {
 
     for file_id in "${bam_files[@]}"; do
     # Extract folder path and base filename
-        local bam_name="$(dx describe "$file_id" --name)"
+        local bam_name
+        bam_name="$(dx describe "$file_id" --name)"
         local local_bam="inputs/${bam_name}"
         dx download "$file_id" -o "$local_bam" -f
-        local base_name="$(basename "$local_bam" .bam)"
+        local base_name
+        base_name="$(basename "$local_bam" .bam)"
         local orig_header="inputs/${base_name}_orig_header.sam"
         local temp_header="inputs/${base_name}_header.sam"
         local output_bam="outputs/${base_name}_$mode.bam"
