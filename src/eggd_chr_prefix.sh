@@ -6,11 +6,10 @@
 set -e -x -o pipefail
 
 main() {
-    dx-download-all-inputs --parallel
     local mode="${mode:-add_chr}" # Defaults to add_chr if no mode is specified
     echo "Starting eggd_chr_prefix execution..."
     echo "Selected Mode: '$mode'"
-    mkdir -p /home/dnanexus/in/input_file/ /home/dnanexus/in/output_file/
+    mkdir -p inputs outputs
 
     # 1. Gather Inputs
     local bam_files=()
@@ -36,11 +35,12 @@ main() {
     for file_id in "${bam_files[@]}"; do
     # Extract folder path and base filename
         local bam_name="$(dx describe "$file_id" --name)"
-        local local_bam="/home/dnanexus/in/input_file/${bam_name}"
+        local local_bam="inputs/${bam_name}"
+        dx download "$file_id" -o "$local_bam" -f
         local base_name="$(basename "$local_bam" .bam)"
-        local orig_header="/home/dnanexus/in/input_file/${base_name}_orig_header.sam"
-        local temp_header="/home/dnanexus/in/input_file/${base_name}_header.sam"
-        local output_bam="/home/dnanexus/in/output_file/${base_name}_$mode.bam"
+        local orig_header="inputs/${base_name}_orig_header.sam"
+        local temp_header="inputs/${base_name}_header.sam"
+        local output_bam="outputs/${base_name}_$mode.bam"
         local output_bai="${output_bam}.bai"
         local sed_cmd
 
