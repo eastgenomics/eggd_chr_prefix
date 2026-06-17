@@ -65,13 +65,11 @@
     "release": "20.04",
     "version": "0",
     "interpreter": "bash",
-    "file": "src/code.sh",
+    "file": "src/eggd_chr_prefix.sh",
     "assetDepends": [
       {
-        "name": "htslib",
-        "project": "project-Fkb6Gkj433GVVvj73J7x8KbV",
-        "folder": "/app_assets/htslib/htslib_v1.22.0",
-        "version": "1.22.0"
+        "id": "record-J1YBvy049yKpP7kk1j4ggqxZ",
+        "project": "project-Fkb6Gkj433GVVvj73J7x8KbV"
       }
     ]
   },
