@@ -6,20 +6,28 @@
 set -e -x -o pipefail
 
 main() {
+    dx-download-all-inputs --parallel
+
     local mode="${mode:-add_chr}" # Defaults to add_chr if no mode is specified
     echo "Starting eggd_chr_prefix execution..."
     echo "Selected Mode: '$mode'"
     mkdir -p inputs outputs
 
-    # 1. Gather Inputs
+    # 1. Gather Inputs  
     local bam_files=()
 
     if [ -n "$input_file" ]; then
-        bam_files+=("$input_file")
+        local_bam="/home/dnanexus/in/input_file/$(dx describe "$input_file" --name)"
+        bam_files+=("$local_bam")
     fi
 
-    if [ -n "$input_file_array" ]; then
-        bam_files+=("${input_file_array[@]}")
+    if [ -n "${input_file_array:-}" ]; then
+        for i in "${!input_file_array[@]}"; do
+            file_id="${input_file_array[$i]}"
+            bam_name="$(dx describe "$file_id" --name)"
+            local_bam="/home/dnanexus/in/input_file_array/${i}/${bam_name}"
+            bam_files+=("$local_bam")
+        done
     fi
 
     if [ ${#bam_files[@]} -eq 0 ] || [ "${bam_files[0]}" == "*.bam" ]; then
@@ -32,14 +40,9 @@ main() {
 
     # 2. Main Execution
 
-    for file_id in "${bam_files[@]}"; do
+    for local_bam in "${bam_files[@]}"; do
     # Extract folder path and base filename
-        local bam_name
-        bam_name="$(dx describe "$file_id" --name)"
-        local local_bam="inputs/${bam_name}"
-        dx download "$file_id" -o "$local_bam" -f
-        local base_name
-        base_name="$(basename "$local_bam" .bam)"
+        local base_name="$(basename "$local_bam" .bam)"
         local orig_header="inputs/${base_name}_orig_header.sam"
         local temp_header="inputs/${base_name}_header.sam"
         local output_bam="outputs/${base_name}_$mode.bam"
