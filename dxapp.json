@@ -21,20 +21,7 @@
       "class": "array:file",
       "optional": true,
       "label": "Input BAM file array",
-      "suggestions": [
-        {
-        "project": "project-Fkb6Gkj433GVVvj73J7x8KbV",
-        "path": "/folder1/folder2/"
-        }
-      ],
       "help": "Provide an array of BAM files to add or remove the 'chr' prefix from"
-    },
-    {
-      "name": "input_folder",
-      "class": "string",
-      "optional": true,
-      "label": "Input Folder Path",
-      "help": "Provide a project folder path (blank if using the current path) to automatically find and process all BAM files inside it."
     },
     {
       "name": "mode",
@@ -72,13 +59,11 @@
     "release": "20.04",
     "version": "0",
     "interpreter": "bash",
-    "file": "src/code.sh",
+    "file": "src/eggd_chr_prefix.sh",
     "assetDepends": [
       {
-        "name": "htslib",
-        "project": "project-Fkb6Gkj433GVVvj73J7x8KbV",
-        "folder": "/app_assets/htslib/htslib_v1.22.0",
-        "version": "1.22.0"
+        "id": "record-J1YBvy049yKpP7kk1j4ggqxZ",
+        "project": "project-Fkb6Gkj433GVVvj73J7x8KbV"
       }
     ]
   },
