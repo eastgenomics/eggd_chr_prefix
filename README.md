@@ -19,7 +19,7 @@ eggd_chr_prefix modifies the metadata headers of alignment files (BAMs) to eithe
 Note: if the file is already in '$mode' format. No new files are created.
 
 ## How to run this app from the command line?
-```
+```bash
 Example A: Running on a single file:
 dx run eggd_chr_prefix \
   -iinput_file="project-Fkb...:file-Fxyz..." \
