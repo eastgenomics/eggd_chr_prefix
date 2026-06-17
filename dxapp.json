@@ -21,12 +21,6 @@
       "class": "array:file",
       "optional": true,
       "label": "Input BAM file array",
-      "suggestions": [
-        {
-        "project": "project-Fkb6Gkj433GVVvj73J7x8KbV",
-        "path": "/folder1/folder2/"
-        }
-      ],
       "help": "Provide an array of BAM files to add or remove the 'chr' prefix from"
     },
     {
