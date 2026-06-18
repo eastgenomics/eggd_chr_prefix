@@ -13,7 +13,7 @@ eggd_chr_prefix modifies the metadata headers of alignment files (BAMs) to eithe
     - Select remove_chr to convert formats to standard Ensembl (e.g., chr1-22 → 1-22, chrX → X, chrM → MT).
 
 ## What are the outputs?
-- output_files (array of files): The resulting .bam files with modified headers. They are dynamically named using _chr or _no_chr suffixes based on the selected mode to prevent overwriting original data.
+- output_files (array of files): The resulting .bam files with modified headers. They are dynamically named using add_chr or _remove_chr suffixes based on the selected mode to prevent overwriting original data.
 - output_indices (array of files): The corresponding .bai index files for the newly modified BAMs.
 
 Note: if the file is already in '$mode' format. No new files are created.
