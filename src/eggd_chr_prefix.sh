@@ -66,7 +66,7 @@ main() {
                 ;;
         esac
 
-        echo "=== Reheadering: $bam_name ==="
+        echo "=== Reheadering: $base_name ==="
         echo "Input BAM: $base_name"
 
         # Extract and modify the header and compare the old one
