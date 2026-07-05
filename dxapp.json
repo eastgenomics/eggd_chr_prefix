@@ -5,7 +5,7 @@
   "dxapi": "1.0.0",
   "version": "1.1.0",
   "properties": {
-    "githubRelease": "1.0.0"
+    "githubRelease": "1.1.0"
   },
   "inputSpec": [
     {
@@ -55,7 +55,8 @@
       "patterns": [
         "*.bam"
       ],
-      "help": "The resulting BAM files with modified headers."
+      "help": "The resulting BAM files with modified headers.",
+      "optional": true
     },
     {
       "name": "output_indices",
@@ -64,7 +65,8 @@
       "patterns": [
         "*.bai"
       ],
-      "help": "The BAI index files for the modified BAM files."
+      "help": "The BAI index files for the modified BAM files.",
+      "optional": true
     },
     {
       "name": "output_bam",
