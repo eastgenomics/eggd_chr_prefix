@@ -13,6 +13,34 @@ main() {
     echo "Selected Mode: '$mode'"
     mkdir -p inputs outputs
 
+    # Single-file mode (eggd_atlas_cnv workflow stage 0): one BAM in -> one BAM + index out,
+    # with PASSTHROUGH when the header is already in the target format (never emit nothing).
+    if [ -n "${input_bam:-}" ]; then
+        local sf_bam sf_base sf_out sf_sed
+        sf_bam="/home/dnanexus/in/input_bam/$(dx describe "$input_bam" --name)"
+        sf_base="$(basename "$sf_bam")"
+        sf_out="outputs/${sf_base}"
+        case "$mode" in
+            "add_chr")    sf_sed='s/\tSN:\([0-9][0-9]*\)\t/\tSN:chr\1\t/g; s/\tSN:X\t/\tSN:chrX\t/g; s/\tSN:Y\t/\tSN:chrY\t/g; s/\tSN:MT\t/\tSN:chrM\t/g' ;;
+            "remove_chr") sf_sed='s/\tSN:chr\([0-9][0-9]*\)\t/\tSN:\1\t/g; s/\tSN:chrX\t/\tSN:X\t/g; s/\tSN:chrY\t/\tSN:Y\t/g; s/\tSN:chrM\t/\tSN:MT\t/g' ;;
+            *) echo "Error: invalid mode '$mode'"; exit 1 ;;
+        esac
+        samtools view -H "$sf_bam" > inputs/sf_orig.sam
+        sed "$sf_sed" inputs/sf_orig.sam > inputs/sf_new.sam
+        if cmp -s inputs/sf_orig.sam inputs/sf_new.sam; then
+            echo "Single-file mode: already in '$mode' format - passthrough."
+            cp "$sf_bam" "$sf_out"
+        else
+            echo "Single-file mode: reheadering to '$mode'."
+            samtools reheader inputs/sf_new.sam "$sf_bam" > "$sf_out"
+        fi
+        samtools index "$sf_out" "${sf_out}.bai"
+        dx-jobutil-add-output output_bam "$(dx upload "$sf_out" --brief)" --class=file
+        dx-jobutil-add-output output_bai "$(dx upload "${sf_out}.bai" --brief)" --class=file
+        echo "Success: eggd_chr_prefix single-file mode completed."
+        return 0
+    fi
+
     # 1. Gather Inputs  
     local bam_files=()
 

@@ -3,17 +3,19 @@
   "title": "eggd_chr_prefix",
   "summary": "Adds or removes the 'chr' prefix from a BAM file header using samtools reheader.",
   "dxapi": "1.0.0",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "properties": {
     "githubRelease": "1.0.0"
-    },
+  },
   "inputSpec": [
     {
       "name": "input_file",
       "class": "file",
       "optional": true,
       "label": "Input single BAM file",
-      "patterns": ["*.bam"],
+      "patterns": [
+        "*.bam"
+      ],
       "help": "The single BAM file to add or remove the 'chr' prefix from."
     },
     {
@@ -28,9 +30,21 @@
       "class": "string",
       "optional": false,
       "default": "add_chr",
-      "choices": ["add_chr", "remove_chr"],
+      "choices": [
+        "add_chr",
+        "remove_chr"
+      ],
       "label": "Prefix Edit Mode",
       "help": "Choose 'add_chr' to convert format to chr1-22/chrX/chrY/chrM. Choose 'remove_chr' to convert format to 1-22/X/Y/MT."
+    },
+    {
+      "name": "input_bam",
+      "class": "file",
+      "optional": true,
+      "patterns": [
+        "*.bam"
+      ],
+      "help": "Single-file mode (eggd_atlas_cnv stage 0): one BAM in -> output_bam + output_bai out, with passthrough if the header is already in the target format. When set, the array inputs are ignored."
     }
   ],
   "outputSpec": [
@@ -38,15 +52,37 @@
       "name": "output_files",
       "class": "array:file",
       "label": "Output modified BAM files",
-      "patterns": ["*.bam"],
+      "patterns": [
+        "*.bam"
+      ],
       "help": "The resulting BAM files with modified headers."
     },
     {
       "name": "output_indices",
       "class": "array:file",
       "label": "Output modified BAM indices",
-      "patterns": ["*.bai"],
+      "patterns": [
+        "*.bai"
+      ],
       "help": "The BAI index files for the modified BAM files."
+    },
+    {
+      "name": "output_bam",
+      "class": "file",
+      "optional": true,
+      "patterns": [
+        "*.bam"
+      ],
+      "help": "Single-file mode: reheadered (or passthrough) BAM"
+    },
+    {
+      "name": "output_bai",
+      "class": "file",
+      "optional": true,
+      "patterns": [
+        "*.bai"
+      ],
+      "help": "Single-file mode: BAM index"
     }
   ],
   "runSpec": {
@@ -67,8 +103,12 @@
       }
     ]
   },
-  "developers":["org-emee_1"],
-  "authorizedUsers": ["org-emee_1"],
+  "developers": [
+    "org-emee_1"
+  ],
+  "authorizedUsers": [
+    "org-emee_1"
+  ],
   "regionalOptions": {
     "aws:eu-central-1": {
       "systemRequirements": {
