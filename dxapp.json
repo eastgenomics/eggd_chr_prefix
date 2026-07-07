@@ -9,17 +9,7 @@
   },
   "inputSpec": [
     {
-      "name": "input_file",
-      "class": "file",
-      "optional": true,
-      "label": "Input single BAM file",
-      "patterns": [
-        "*.bam"
-      ],
-      "help": "The single BAM file to add or remove the 'chr' prefix from."
-    },
-    {
-      "name": "input_file_array",
+      "name": "input_bam_array",
       "class": "array:file",
       "optional": true,
       "label": "Input BAM file array",
