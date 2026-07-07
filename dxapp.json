@@ -9,6 +9,16 @@
   },
   "inputSpec": [
     {
+      "name": "input_bam",
+      "class": "file",
+      "optional": true,
+      "label": "Single input BAM file",
+      "patterns": [
+        "*.bam"
+      ],
+      "help": "Single-file mode (eggd_atlas_cnv stage 0): one BAM in -> output_bam + output_bai out, with passthrough if the header is already in the target format. When set, the array inputs are ignored."
+    },
+    {
       "name": "input_bam_array",
       "class": "array:file",
       "optional": true,
@@ -26,15 +36,6 @@
       ],
       "label": "Prefix Edit Mode",
       "help": "Choose 'add_chr' to convert format to chr1-22/chrX/chrY/chrM. Choose 'remove_chr' to convert format to 1-22/X/Y/MT."
-    },
-    {
-      "name": "input_bam",
-      "class": "file",
-      "optional": true,
-      "patterns": [
-        "*.bam"
-      ],
-      "help": "Single-file mode (eggd_atlas_cnv stage 0): one BAM in -> output_bam + output_bai out, with passthrough if the header is already in the target format. When set, the array inputs are ignored."
     }
   ],
   "outputSpec": [
