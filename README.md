@@ -13,12 +13,12 @@ eggd_chr_prefix modifies the metadata headers of alignment files (BAMs) to eithe
     - Select remove_chr to convert formats to standard Ensembl (e.g., chr1-22 → 1-22, chrX → X, chrM → MT).
 
 ## What are the outputs?
-- output_bam (file, optional): **single-file mode** — the reheadered (or passthrough) .bam.
+- output_bam (file, optional): **single-file mode** — the reheadered (or passthrough) .bam, dynamically named with `_add_chr`/`_remove_chr` suffixes.
 - output_bai (file, optional): **single-file mode** — its .bai index.
-- output_files (array of files, optional): array mode — resulting .bam files with modified headers, dynamically named with `_add_chr`/`_remove_chr` suffixes to avoid overwriting originals.
+- output_files (array of files, optional): array mode — resulting .bam files with modified headers, dynamically named with `_add_chr`/`_remove_chr` suffixes.
 - output_indices (array of files, optional): array mode — the corresponding .bai index files.
 
-Note: If the file is already in '$mode' format. No new files are created (passthrough).
+Note: If the file is already in '$mode' format, a passthrough output will still be created with the mode suffix in the filename.
 
 ## How to run this app from the command line?
 ```bash
@@ -36,4 +36,4 @@ dx run eggd_chr_prefix \
 
 ## Single-file mode (v1.1.0)
 
-For per-sample use as **stage 0** of the [`eggd_atlas_cnv`](https://github.com/eastgenomics/eggd_atlas_cnv) workflow, supply `input_bam` (a single BAM). The app then emits single-file `output_bam` + `output_bai`, reheadering to the selected `mode` (default `add_chr`) or **passing the BAM through unchanged** (with a generated index) when it is already in the target format. When `input_bam` is set, the array inputs are ignored. This guarantees every downstream stage receives an indexed BAM regardless of the input naming.
+For per-sample use as **stage 0** of the [`eggd_atlas_cnv`](https://github.com/eastgenomics/eggd_atlas_cnv) workflow, supply `input_bam` (a single BAM). The app then emits single-file `output_bam` + `output_bai`, reheadering to the selected `mode` (default `add_chr`) or **passing the BAM through unchanged** (with a generated index) when it is already in the target format. When `input_bam` is set, the array inputs are ignored. This guarantees every downstream stage receives an indexed BAM.
