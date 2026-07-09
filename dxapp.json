@@ -4,6 +4,7 @@
   "summary": "Adds or removes the 'chr' prefix from a BAM file header using samtools reheader.",
   "dxapi": "1.0.0",
   "version": "1.1.0",
+  "whatsNew": "* v1.1.0 refines the existing single-file mode, adds passthrough support for BAM files already in the desired format as a valid output, and improves upload performance through parallel uploading of multiple output files.",
   "properties": {
     "githubRelease": "1.1.0"
   },
