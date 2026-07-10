@@ -12,7 +12,6 @@ main() {
     local single_mode=false
     echo "Starting eggd_chr_prefix execution..."
     echo "Selected Mode: '$mode'"
-    mkdir -p inputs outputs
 
     # 1. Gather Inputs
 
@@ -20,11 +19,14 @@ main() {
     # with PASSTHROUGH when the header is already in the target format (never emit nothing).
 
     local bam_files=()
+    local output_bam
+    local output_bai
 
     if [ -n "${input_bam:-}" ]; then
         local_bam="/home/dnanexus/in/input_bam/$(dx describe "$input_bam" --name)"
         single_mode=true
         bam_files+=("$local_bam")
+        mkdir -p inputs /home/dnanexus/out/output_bam /home/dnanexus/out/output_bai
     fi
 
     if [ -n "${input_bam_array:-}" ]; then
@@ -33,6 +35,7 @@ main() {
             bam_name="$(dx describe "$file_id" --name)"
             local_bam="/home/dnanexus/in/input_bam_array/${i}/${bam_name}"
             bam_files+=("$local_bam")
+            mkdir -p inputs /home/dnanexus/out/output_files /home/dnanexus/out/output_indices 
         done
     fi
 
@@ -49,16 +52,20 @@ main() {
 
 
     # 2. Main Execution
-    local output_bam_paths=()
-    local output_bai_paths=()
     for local_bam in "${bam_files[@]}"; do
     # Extract folder path and base filename
         local base_name="$(basename "$local_bam" .bam)"
         local orig_header="inputs/${base_name}_orig_header.sam"
         local temp_header="inputs/${base_name}_header.sam"
-        local output_bam="outputs/${base_name}_$mode.bam"
-        local output_bai="${output_bam}.bai"
         local sed_cmd
+        if [ "$single_mode" = true ]; then
+            output_bam="/home/dnanexus/out/output_bam/${base_name}_$mode.bam"
+            output_bai="/home/dnanexus/out/output_bai/${base_name}_$mode.bam.bai"
+        else
+            output_bam="/home/dnanexus/out/output_files/${base_name}_$mode.bam"
+            output_bai="/home/dnanexus/out/output_indices/${base_name}_$mode.bam.bai"
+        fi
+
 
     # Swap sed logic based on mode
         case "$mode" in
@@ -99,12 +106,10 @@ main() {
         fi
 
         echo "Indexing..."
-        samtools index "$output_bam"
+        samtools index "$output_bam" "$output_bai"
 
         echo "Verifying chr prefix in new BAM:"
         samtools view -H "$output_bam" | grep "^@SQ" | head -5 || true
-        output_bam_paths+=("$output_bam")
-        output_bai_paths+=("$output_bai")
         # Clean up the temporary header file
         rm -f "$orig_header" "$temp_header"
         echo "Done: $base_name"
@@ -112,29 +117,6 @@ main() {
 
 
     echo "Uploading outputs..."
-    if [ "$single_mode" = true ]; then
-        # single-file mode: upload the single BAM and its index
-        local bam_dxid bai_dxid
-        bam_dxid="$(dx upload "${output_bam_paths[0]}" --project "${DX_PROJECT_CONTEXT_ID}" --brief)"
-        bai_dxid="$(dx upload "${output_bai_paths[0]}" --project "${DX_PROJECT_CONTEXT_ID}" --brief)"
-        dx-jobutil-add-output output_bam "$bam_dxid" --class=file
-        dx-jobutil-add-output output_bai "$bai_dxid" --class=file
-        echo "Success: single-file mode completed."
-    else
-        # array mode: upload all BAMs and their indices
-        local uploaded_bams=()
-        local uploaded_bais=()
-        local f
-       # Upload BAMs and BAIs in parallel and capture their DX IDs
-        mapfile -t uploaded_bams < <(dx upload "${output_bam_paths[@]}" --project "${DX_PROJECT_CONTEXT_ID}" --brief)
-        mapfile -t uploaded_bais < <(dx upload "${output_bai_paths[@]}" --project "${DX_PROJECT_CONTEXT_ID}" --brief)
-        for f in "${uploaded_bams[@]}"; do
-            dx-jobutil-add-output output_files "$f" --array
-        done
-        for f in "${uploaded_bais[@]}"; do
-            dx-jobutil-add-output output_indices "$f" --array
-        done
-        echo "Success: array mode completed."
-    fi
+    dx-upload-all-outputs --parallel
     echo "Success: eggd_chr_prefix job completed."
 }
