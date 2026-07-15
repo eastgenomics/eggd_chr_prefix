@@ -36,4 +36,4 @@ dx run eggd_chr_prefix \
 
 ## Single-file mode (v1.1.0)
 
-For per-sample use as **stage 0** of the [`eggd_atlas_cnv`](https://github.com/eastgenomics/eggd_atlas_cnv) workflow, supply `input_bam` (a single BAM). The app then emits single-file `output_bam` + `output_bai`, reheadering to the selected `mode` (default `add_chr`) or **passing the BAM through unchanged** (with a generated index) when it is already in the target format. When `input_bam` is set, the array inputs are ignored. This guarantees every downstream stage receives an indexed BAM.
+For per-sample use as **stage 0** of the [`eggd_atlas_cnv`](https://github.com/eastgenomics/eggd_atlas_cnv) workflow, supply `input_bam` (a single BAM). The app then emits single-file `output_bam` + `output_bai`, reheadering to the selected `mode` (default `add_chr`) or **passing the BAM through unchanged** (with a generated index) when it is already in the target format. When `input_bam` is set, the array inputs are not allow. This guarantees every downstream stage receives an indexed BAM.
