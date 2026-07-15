@@ -17,7 +17,7 @@
       "patterns": [
         "*.bam"
       ],
-      "help": "Single-file mode (eggd_atlas_cnv stage 0): one BAM in -> output_bam + output_bai out, with passthrough if the header is already in the target format. When set, the array inputs are ignored."
+      "help": "Single-file mode (eggd_atlas_cnv stage 0): one BAM in -> output_bam + output_bai out, with passthrough if the header is already in the target format."
     },
     {
       "name": "input_bam_array",
