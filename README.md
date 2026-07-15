@@ -6,7 +6,7 @@ This app provides an automated solution for handling Ensembl (1-22/X/Y/MT) and U
 eggd_chr_prefix modifies the metadata headers of alignment files (BAMs) to either add or remove the chr prefix from chromosome sequence names (e.g., converting 1 to chr1, or chrX to X). It utilises samtools reheader for these alterations and automatically generates the required accompanying coordinate index (.bai) files.
 
 ## What are the inputs?
-- input_bam (file, optional): A single .bam for **single-file mode** (v1.1.0) — emits `output_bam` + `output_bai`. When set, the array inputs below are ignored. See "Single-file mode" below.
+- input_bam (file, optional): A single .bam for **single-file mode** (v1.1.0) — emits `output_bam` + `output_bai`. When set, the array inputs below are not allowed. See "Single-file mode" below.
 - input_bam_array (array of files, optional): A specific list of multiple .bam files.
 - mode (string, required): The directional prefix edit mode. Defaults to add_chr.
     - Select add_chr to convert formats to standard UCSC (e.g., 1-22 → chr1-22, X → chrX, MT → chrM).
